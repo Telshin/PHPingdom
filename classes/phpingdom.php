@@ -11,14 +11,41 @@
 **/
 
 class phpingdom {
-	private $appkey;
-	private $username;
-	private $password;
+	protected $appkey;
+	protected $username;
+	protected $password;
 	private $base = 'https://api.pingdom.com/api/2.0';
 
 	public function __construct($appkey, $username, $password){
+		if (!$appkey || !$username || !$password) {
+			return false;
+		}
+		$this->setUsername($username);
+		$this->setPassword($password);
+		$this->setAppkey($appkey);
+	}
+
+	private function getUsername() {
+		$this->username;
+	}
+
+	private function setUsername($username) {
 		$this->username = $username;
+	}
+
+	private function getPassword() {
+		return $this->password;
+	}
+
+	private function setPassword($password) {
 		$this->password = $password;
+	}
+
+	private function getAppKey() {
+		return $this->appkey;
+	}
+
+	private function setAppkey($appkey) {
 		$this->appkey = htmlspecialchars($appkey);
 	}
 
@@ -111,4 +138,3 @@ class phpingdom {
 		return $args;
 	}
 }
-?>
