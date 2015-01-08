@@ -59,8 +59,8 @@ class phpingdom {
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); //Follow Redirects
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Return Transfer as a string
-		curl_setopt($ch, CURLOPT_USERPWD, "{$this->username}:{$this->password}");
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('App-Key: ' . $this->appkey));
+		curl_setopt($ch, CURLOPT_USERPWD, $this->getUsername().':'.$this->getPassword());
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('App-Key: ' . $this->getAppKey()));
 
 		//Let's get some methods determined for CURL
 		switch ($method){
