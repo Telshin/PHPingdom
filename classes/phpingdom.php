@@ -11,9 +11,9 @@
 **/
 
 class phpingdom {
-	protected $appkey;
-	protected $username;
-	protected $password;
+	private $appkey;
+	private $username;
+	private $password;
 	private $base = 'https://api.pingdom.com/api/2.0';
 
 	public function __construct($appkey, $username, $password){
@@ -50,13 +50,14 @@ class phpingdom {
 	}
 
 /* Curl Function */
-	private function curlPingdom($method, $job, $data = null){
+	private function curlPingdom($method, $url, $data = null){
 		$debug = true;
 		//Build the URL for CURL
-		$job = str_replace( '&amp;', '&', urldecode(trim($job)));
+		$url = str_replace( '&amp;', '&', urldecode(trim($url)));
 
 		//Let's setup CURL to get our information
-		$ch = curl_init($job);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); //Follow Redirects
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Return Transfer as a string
 		curl_setopt($ch, CURLOPT_USERPWD, "{$this->username}:{$this->password}");
@@ -120,6 +121,16 @@ class phpingdom {
 		return $this->verifyData($data);
 	}
 
+	public function getCheckSummaryAverage($checkId, $args = null) {
+		$job = $this->base.'/summary.average/'.$checkId;
+
+		$job = $this->buildUrl($job, $args);
+
+		//Time to cURL
+		$data = $this->curlPingdom('GET', $job);
+
+		return $this->verifyData($data);
+	}
 
 	/* Miscellaneous Functions */
 	public function verifyData($data){
@@ -136,5 +147,13 @@ class phpingdom {
 			$args[] = $key.'='.$value;
 		}
 		return $args;
+	}
+
+	private function buildUrl($url, $arguments) {
+		if ($arguments) {
+			$args = $this->curlArguments($arguments);
+			$url = $url.'/'.implode('&', $args);
+		}
+		return $url;
 	}
 }
