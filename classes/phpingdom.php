@@ -50,8 +50,7 @@ class phpingdom {
 	}
 
 /* Curl Function */
-	private function curlPingdom($method, $url, $data = null){
-		$debug = true;
+	private function curlPingdom($method, $url, $postData = null, $debug = false){
 		//Build the URL for CURL
 		$url = str_replace( '&amp;', '&', urldecode(trim($url)));
 
@@ -67,7 +66,7 @@ class phpingdom {
 		switch ($method){
 			case 'POST':
 				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 				break;
 			case 'PUT':
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
@@ -103,31 +102,35 @@ class phpingdom {
 
 	/* Get Check List */
 	public function getCheckList($args = null) {
-		$job = $this->base.'/checks';
+		$endpoint = $this->base.'/checks';
+
+		$url = $this->buildUrl($endpoint);
 
 		// Time to cURL
-		$data = $this->curlPingdom('GET', $job, $args);
+		$data = $this->curlPingdom('GET', $url);
 
 		return $this->verifyData($data);
 	}
 
 	/* Get a check by ID */
 	public function getCheckById($checkId) {
-		$job = $this->base.'/checks/'.$checkId;
+		$endpoint = '/checks/'.$checkId;
+
+		$url = $this->buildUrl($endpoint);
 
 		// Time to cURL
-		$data = $this->curlPingdom('GET', $job);
+		$data = $this->curlPingdom('GET', $url);
 
 		return $this->verifyData($data);
 	}
 
 	public function getCheckSummaryAverage($checkId, $args = null) {
-		$job = $this->base.'/summary.average/'.$checkId;
+		$endpoint = '/summary.average/'.$checkId;
 
-		$job = $this->buildUrl($job, $args);
+		$url = $this->buildUrl($endpoint, $args);
 
 		//Time to cURL
-		$data = $this->curlPingdom('GET', $job);
+		$data = $this->curlPingdom('GET', $url);
 
 		return $this->verifyData($data);
 	}
@@ -149,7 +152,8 @@ class phpingdom {
 		return $args;
 	}
 
-	private function buildUrl($url, $arguments) {
+	private function buildUrl($task, $arguments = null) {
+		$url = $this->base.$task;
 		if ($arguments) {
 			$args = $this->curlArguments($arguments);
 			$url = $url.'/'.implode('&', $args);
