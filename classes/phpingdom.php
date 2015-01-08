@@ -51,9 +51,6 @@ class phpingdom {
 
 /* Curl Function */
 	private function curlPingdom($method, $url, $postData = null, $debug = false){
-		//Build the URL for CURL
-		$url = str_replace( '&amp;', '&', urldecode(trim($url)));
-
 		//Let's setup CURL to get our information
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -179,6 +176,7 @@ class phpingdom {
 		if ($arguments) {
 			$args = $this->curlArguments($arguments);
 			$url = $url.'/'.implode('&', $args);
+			$url = str_replace( '&amp;', '&', urldecode(trim($url)));
 		}
 		return $url;
 	}
