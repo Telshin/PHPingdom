@@ -135,6 +135,27 @@ class phpingdom {
 		return $this->verifyData($data);
 	}
 
+	public function getCheckSummaryHourly($checkId, $args = null) {
+		$endpoint = '/summary.hoursofday/'.$checkId;
+
+		$url = $this->buildUrl($endpoint, $args);
+
+		//Time to cURL
+		$data = $this->curlPingdom('GET', $url);
+
+		return $this->verifyData($data);
+	}
+
+	public function getCheckOutageSummary($checkId, $args = null) {
+		$endpoint = '/summary.outage/'.$checkId;
+
+		$url = $this->buildUrl($endpoint, $args);
+
+		$data = $this->curlPingdom('GET', $url);
+
+		return $this->verifyData($data);
+	}
+
 	/* Miscellaneous Functions */
 	public function verifyData($data){
 		if($data){
@@ -152,6 +173,7 @@ class phpingdom {
 		return $args;
 	}
 
+	/* Build the URL needed to cURL */
 	private function buildUrl($task, $arguments = null) {
 		$url = $this->base.$task;
 		if ($arguments) {
