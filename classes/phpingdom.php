@@ -106,7 +106,7 @@ class phpingdom {
 		// Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
-		return $this->verifyData($data);
+		return $data;
 	}
 
 	/* Get a check by ID */
@@ -118,7 +118,7 @@ class phpingdom {
 		// Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
-		return $this->verifyData($data);
+		return $data;
 	}
 
 	public function getCheckSummaryAverage($checkId, $args = null) {
@@ -129,7 +129,7 @@ class phpingdom {
 		//Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
-		return $this->verifyData($data);
+		return $data;
 	}
 
 	public function getCheckSummaryHourly($checkId, $args = null) {
@@ -140,7 +140,7 @@ class phpingdom {
 		//Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
-		return $this->verifyData($data);
+		return $data;
 	}
 
 	public function getCheckOutageSummary($checkId, $args = null) {
@@ -150,16 +150,7 @@ class phpingdom {
 
 		$data = $this->curlPingdom('GET', $url);
 
-		return $this->verifyData($data);
-	}
-
-	/* Miscellaneous Functions */
-	public function verifyData($data){
-		if($data){
-			return $data;
-		} else {
-			return false;
-		}
+		return $data;
 	}
 
 	/* URL Arguements for Curl URL */
