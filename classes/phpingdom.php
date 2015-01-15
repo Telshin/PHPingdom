@@ -11,11 +11,41 @@
 **/
 
 class phpingdom {
+	/**
+	 * Appkey from Pingdom's API system.
+	 *
+	 * @var string
+	 */
 	private $appkey;
+
+	/**
+	 * Username that is usually an e-mail
+	 *
+	 * @var string
+	 */
 	private $username;
+
+	/**
+	 * Password for the Pingdom account
+	 *
+	 * @var string
+	 */
 	private $password;
+
+	/**
+	 * Base URL for the Pingdom API
+	 *
+	 * @var string
+	 */
 	private $base = 'https://api.pingdom.com/api/2.0';
 
+	/**
+	 * Constructor for PHPingdom
+	 *
+	 * @param $appkey	string
+	 * @param $username	string
+	 * @param $password	string
+	 */
 	public function __construct($appkey, $username, $password){
 		if (!$appkey || !$username || !$password) {
 			return false;
@@ -25,31 +55,63 @@ class phpingdom {
 		$this->setAppkey($appkey);
 	}
 
+	/**
+	 * Username getter method
+	 * @return mixed
+	 */
 	private function getUsername() {
-		$this->username;
+		return $this->username;
 	}
 
+	/**
+	 * Username setter method
+	 * @param $username	string
+	 */
 	private function setUsername($username) {
 		$this->username = $username;
 	}
 
+	/**
+	 * Password getter method
+	 * @return mixed
+	 */
 	private function getPassword() {
 		return $this->password;
 	}
 
+	/**
+	 * Password setter method
+	 * @param $password	string
+	 */
 	private function setPassword($password) {
 		$this->password = $password;
 	}
 
+	/**
+	 * AppKey getter method
+	 * @return mixed
+	 */
 	private function getAppKey() {
 		return $this->appkey;
 	}
 
+	/**
+	 * AppKey setter method
+	 * @param $appkey	string
+	 */
 	private function setAppkey($appkey) {
 		$this->appkey = htmlspecialchars($appkey);
 	}
 
-/* Curl Function */
+	/**
+	 * Sends out a cURL request to the Pingdom API
+	 *
+	 * @param $method	string
+	 * @param $url	string
+	 * @param null $postData
+	 * @param bool $debug
+	 * @return int|mixed
+	 */
 	private function curlPingdom($method, $url, $postData = null, $debug = false){
 		//Let's setup CURL to get our information
 		$ch = curl_init();
@@ -97,7 +159,13 @@ class phpingdom {
 		return json_decode($data);
 	}
 
-	/* Get Check List */
+	/**
+	 * Retrieve a full list of all checks by account
+	 * For more info: https://www.pingdom.com/features/api/documentation/#MethodGet+Check+List
+	 *
+	 * @param null $args
+	 * @return int|mixed
+	 */
 	public function getCheckList($args = null) {
 		$endpoint = $this->base.'/checks';
 
@@ -109,7 +177,13 @@ class phpingdom {
 		return $data;
 	}
 
-	/* Get a check by ID */
+	/**
+	 * Get check information by Id
+	 * For more info: https://www.pingdom.com/features/api/documentation/#MethodGet+Detailed+Check+Information
+	 *
+	 * @param $checkId
+	 * @return int|mixed
+	 */
 	public function getCheckById($checkId) {
 		$endpoint = '/checks/'.$checkId;
 
@@ -121,6 +195,14 @@ class phpingdom {
 		return $data;
 	}
 
+	/**
+	 * Gets the average uptime value on a check for a period of time.
+	 * For more info: https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
+	 *
+	 * @param $checkId
+	 * @param null $args
+	 * @return int|mixed
+	 */
 	public function getCheckSummaryAverage($checkId, $args = null) {
 		$endpoint = '/summary.average/'.$checkId;
 
@@ -132,6 +214,14 @@ class phpingdom {
 		return $data;
 	}
 
+	/**
+	 * Grabs an hourly average response time for a period of time.
+	 * For more info: https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
+	 *
+	 * @param $checkId
+	 * @param null $args
+	 * @return int|mixed
+	 */
 	public function getCheckSummaryHourly($checkId, $args = null) {
 		$endpoint = '/summary.hoursofday/'.$checkId;
 
@@ -143,6 +233,14 @@ class phpingdom {
 		return $data;
 	}
 
+	/**
+	 * Grab a checks outage summary from a point in time.
+	 * For more info: https://www.pingdom.com/features/api/documentation/#ResourceSummary.outage
+	 *
+	 * @param $checkId
+	 * @param null $args
+	 * @return int|mixed
+	 */
 	public function getCheckOutageSummary($checkId, $args = null) {
 		$endpoint = '/summary.outage/'.$checkId;
 
@@ -153,7 +251,12 @@ class phpingdom {
 		return $data;
 	}
 
-	/* URL Arguements for Curl URL */
+	/**
+	 * Pass an array to break it out into arguments.
+	 *
+	 * @param $arguements
+	 * @return array
+	 */
 	private function curlArguments($arguements){
 		foreach($arguements as $key => $value){
 			$args[] = $key.'='.$value;
@@ -161,7 +264,13 @@ class phpingdom {
 		return $args;
 	}
 
-	/* Build the URL needed to cURL */
+	/**
+	 * Pass a method and arguments to build the URL for cURL
+	 *
+	 * @param $task
+	 * @param null $arguments
+	 * @return mixed|string
+	 */
 	private function buildUrl($task, $arguments = null) {
 		$url = $this->base.$task;
 		if ($arguments) {
