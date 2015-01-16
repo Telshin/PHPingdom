@@ -3,51 +3,50 @@
  * PHPivtoal
  * PHPivotal Class File
  *
- * @author: 	Telshin
- * @license: 	All Rights Reserved
- * @package: 	PHPivotal
- * @link		http://www.telshin.com/
+ * @author	Telshin
+ * @license	All Rights Reserved
+ * @package	PHPivotal
+ * @link	http://www.telshin.com/
  *
-**/
-
+ */
 class phpingdom {
 	/**
-	 * Appkey from Pingdom's API system.
+	 * Pingdom appkey for API system.
 	 *
-	 * @var string
+	 * @var String $appkey Pingdom API key
 	 */
 	private $appkey;
 
 	/**
-	 * Username that is usually an e-mail
+	 * Pingdom username, this is usually an e-mail
 	 *
-	 * @var string
+	 * @var String $username Pingdom username
 	 */
 	private $username;
 
 	/**
-	 * Password for the Pingdom account
+	 * Pingdom password
 	 *
-	 * @var string
+	 * @var String $password Pingdom password
 	 */
 	private $password;
 
 	/**
 	 * Base URL for the Pingdom API
 	 *
-	 * @var string
+	 * @var String $base Base URL
 	 */
 	private $base = 'https://api.pingdom.com/api/2.0';
 
 	/**
 	 * Constructor for PHPingdom
 	 *
-	 * @param $appkey	string
-	 * @param $username	string
-	 * @param $password	string
+	 * @param String $appkey API key
+	 * @param String $username Username
+	 * @param String $password Password
 	 */
 	public function __construct($appkey, $username, $password){
-		if (!$appkey || !$username || !$password) {
+		if (!empty($appkey) || !empty($username) || !empty($password)) {
 			return false;
 		}
 		$this->setUsername($username);
@@ -57,7 +56,7 @@ class phpingdom {
 
 	/**
 	 * Username getter method
-	 * @return mixed
+	 * @return String
 	 */
 	private function getUsername() {
 		return $this->username;
@@ -65,7 +64,7 @@ class phpingdom {
 
 	/**
 	 * Username setter method
-	 * @param $username	string
+	 * @param String $username The username to set
 	 */
 	private function setUsername($username) {
 		$this->username = $username;
@@ -73,7 +72,7 @@ class phpingdom {
 
 	/**
 	 * Password getter method
-	 * @return mixed
+	 * @return String Password
 	 */
 	private function getPassword() {
 		return $this->password;
@@ -81,7 +80,7 @@ class phpingdom {
 
 	/**
 	 * Password setter method
-	 * @param $password	string
+	 * @param String $password The password to set
 	 */
 	private function setPassword($password) {
 		$this->password = $password;
@@ -89,7 +88,7 @@ class phpingdom {
 
 	/**
 	 * AppKey getter method
-	 * @return mixed
+	 * @return String
 	 */
 	private function getAppKey() {
 		return $this->appkey;
@@ -97,7 +96,7 @@ class phpingdom {
 
 	/**
 	 * AppKey setter method
-	 * @param $appkey	string
+	 * @param String $appkey The API key
 	 */
 	private function setAppkey($appkey) {
 		$this->appkey = htmlspecialchars($appkey);
@@ -106,22 +105,22 @@ class phpingdom {
 	/**
 	 * Sends out a cURL request to the Pingdom API
 	 *
-	 * @param $method	string
-	 * @param $url	string
-	 * @param null $postData
-	 * @param bool $debug
-	 * @return int|mixed
+	 * @param String $method The method to use (post or get)
+	 * @param String $url The URL to post to
+	 * @param Array $postData The data to post with
+	 * @param Boolean $debug Debug
+	 * @return Integer|Mixed
 	 */
 	private function curlPingdom($method, $url, $postData = null, $debug = false){
-		//Let's setup CURL to get our information
+		// Let's setup CURL to get our information
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); //Follow Redirects
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //Return Transfer as a string
-		curl_setopt($ch, CURLOPT_USERPWD, $this->getUsername().':'.$this->getPassword());
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // Follow Redirects
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Return Transfer as a string
+		curl_setopt($ch, CURLOPT_USERPWD, $this->getUsername() . ':' . $this->getPassword());
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('App-Key: ' . $this->getAppKey()));
 
-		//Let's get some methods determined for CURL
+		// Let's get some methods determined for CURL
 		switch ($method){
 			case 'POST':
 				curl_setopt($ch, CURLOPT_POST, 1);
@@ -149,8 +148,8 @@ class phpingdom {
 			$lastRequestInfo = curl_getinfo($ch);
 		}
 
-		//Close CURL if there are no errors, if error, let's see it.
-		if(curl_errno($ch)){
+		// Close CURL if there are no errors, if error, let's see it.
+		if (curl_errno($ch)){
 			return curl_errno($ch);
 		} else {
 			curl_close($ch);
@@ -161,13 +160,14 @@ class phpingdom {
 
 	/**
 	 * Retrieve a full list of all checks by account
-	 * For more info: https://www.pingdom.com/features/api/documentation/#MethodGet+Check+List
 	 *
-	 * @param null $args
-	 * @return int|mixed
+	 * @see https://www.pingdom.com/features/api/documentation/#MethodGet+Check+List
+	 *
+	 * @param Array $args The arguments to post
+	 * @return Integer|Mixed
 	 */
 	public function getCheckList($args = null) {
-		$endpoint = $this->base.'/checks';
+		$endpoint = $this->base . '/checks';
 
 		$url = $this->buildUrl($endpoint);
 
@@ -179,13 +179,14 @@ class phpingdom {
 
 	/**
 	 * Get check information by Id
-	 * For more info: https://www.pingdom.com/features/api/documentation/#MethodGet+Detailed+Check+Information
 	 *
-	 * @param $checkId
-	 * @return int|mixed
+	 * @see https://www.pingdom.com/features/api/documentation/#MethodGet+Detailed+Check+Information
+	 *
+	 * @param Integer|String $checkId The ID to check
+	 * @return Integer|Mixed
 	 */
 	public function getCheckById($checkId) {
-		$endpoint = '/checks/'.$checkId;
+		$endpoint = '/checks/' . $checkId;
 
 		$url = $this->buildUrl($endpoint);
 
@@ -197,18 +198,19 @@ class phpingdom {
 
 	/**
 	 * Gets the average uptime value on a check for a period of time.
-	 * For more info: https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
 	 *
-	 * @param $checkId
-	 * @param null $args
-	 * @return int|mixed
+	 * @see https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
+	 *
+	 * @param Integer|String $checkId The ID to check
+	 * @param Array $args The arguments to post
+	 * @return Integer|Mixed
 	 */
 	public function getCheckSummaryAverage($checkId, $args = null) {
-		$endpoint = '/summary.average/'.$checkId;
+		$endpoint = '/summary.average/' . $checkId;
 
 		$url = $this->buildUrl($endpoint, $args);
 
-		//Time to cURL
+		// Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
 		return $data;
@@ -216,18 +218,19 @@ class phpingdom {
 
 	/**
 	 * Grabs an hourly average response time for a period of time.
-	 * For more info: https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
 	 *
-	 * @param $checkId
-	 * @param null $args
-	 * @return int|mixed
+	 * @see https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
+	 *
+	 * @param Integer|String $checkId The ID to check
+	 * @param Array $args The arguments to post
+	 * @return Integer|Mixed
 	 */
 	public function getCheckSummaryHourly($checkId, $args = null) {
-		$endpoint = '/summary.hoursofday/'.$checkId;
+		$endpoint = '/summary.hoursofday/' . $checkId;
 
 		$url = $this->buildUrl($endpoint, $args);
 
-		//Time to cURL
+		// Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
 		return $data;
@@ -235,14 +238,15 @@ class phpingdom {
 
 	/**
 	 * Grab a checks outage summary from a point in time.
-	 * For more info: https://www.pingdom.com/features/api/documentation/#ResourceSummary.outage
 	 *
-	 * @param $checkId
-	 * @param null $args
-	 * @return int|mixed
+	 * @see https://www.pingdom.com/features/api/documentation/#ResourceSummary.outage
+	 *
+	 * @param Integer|String $checkId The ID to check
+	 * @param Array $args The arguments to post
+	 * @return Integer|Mixed
 	 */
 	public function getCheckOutageSummary($checkId, $args = null) {
-		$endpoint = '/summary.outage/'.$checkId;
+		$endpoint = '/summary.outage/' . $checkId;
 
 		$url = $this->buildUrl($endpoint, $args);
 
@@ -254,12 +258,12 @@ class phpingdom {
 	/**
 	 * Pass an array to break it out into arguments.
 	 *
-	 * @param $arguements
-	 * @return array
+	 * @param Array $arguments The arguments to post
+	 * @return Array
 	 */
-	private function curlArguments($arguements){
-		foreach($arguements as $key => $value){
-			$args[] = $key.'='.$value;
+	private function curlArguments($arguments){
+		foreach ($arguments as $key => $value){
+			$args[] = $key . '=' . $value;
 		}
 		return $args;
 	}
@@ -267,16 +271,16 @@ class phpingdom {
 	/**
 	 * Pass a method and arguments to build the URL for cURL
 	 *
-	 * @param $task
-	 * @param null $arguments
-	 * @return mixed|string
+	 * @param Integer|String $task The task to check
+	 * @param Array $arguments The arguments to post
+	 * @return Mixed|String
 	 */
 	private function buildUrl($task, $arguments = null) {
 		$url = $this->base.$task;
 		if ($arguments) {
 			$args = $this->curlArguments($arguments);
-			$url = $url.'/'.implode('&', $args);
-			$url = str_replace( '&amp;', '&', urldecode(trim($url)));
+			$url = $url . '/' . implode('&', $args);
+			$url = str_replace('&amp;', '&', urldecode(trim($url)));
 		}
 		return $url;
 	}
