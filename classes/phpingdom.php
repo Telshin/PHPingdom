@@ -250,6 +250,7 @@ class phpingdom {
 
 		$url = $this->buildUrl($endpoint, $args);
 
+		// Time to cURL
 		$data = $this->curlPingdom('GET', $url);
 
 		return $data;
