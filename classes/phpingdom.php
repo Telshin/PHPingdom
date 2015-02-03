@@ -1,11 +1,11 @@
 <?php
 /**
- * PHPivtoal
- * PHPivotal Class File
+ * PHPingdom
+ * PHPingdom Class File
  *
  * @author	Telshin
  * @license	All Rights Reserved
- * @package	PHPivotal
+ * @package	PHPingdom
  * @link	http://www.telshin.com/
  *
  */
