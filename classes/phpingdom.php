@@ -4,7 +4,7 @@
  * PHPingdom Class File
  *
  * @author	Telshin
- * @license	All Rights Reserved
+ * @license	GNU GPLv3.0
  * @package	PHPingdom
  * @link	http://www.telshin.com/
  *
@@ -159,15 +159,32 @@ class phpingdom {
 	}
 
 	/**
-	 * Retrieve a full list of all checks by account
+	 * Retrieve a list of actions for an account
+	 * @see https://www.pingdom.com/features/api/documentation/#MethodGet+Actions+%28Alerts%29+List
 	 *
+	 * @param null $args
+	 * @return int|Mixed
+	 */
+	public function getActions($args = null) {
+		$endpoint = '/actions';
+
+		$url = $this->buildUrl($endpoint);
+
+		// Time to cURL
+		$data = $this->curlPingdom('GET', $url);
+
+		return $data;
+	}
+
+	/**
+	 * Retrieve a full list of all checks by account
 	 * @see https://www.pingdom.com/features/api/documentation/#MethodGet+Check+List
 	 *
 	 * @param Array $args The arguments to post
 	 * @return Integer|Mixed
 	 */
 	public function getCheckList($args = null) {
-		$endpoint = $this->base . '/checks';
+		$endpoint = '/checks';
 
 		$url = $this->buildUrl($endpoint);
 
@@ -179,14 +196,13 @@ class phpingdom {
 
 	/**
 	 * Get check information by Id
-	 *
 	 * @see https://www.pingdom.com/features/api/documentation/#MethodGet+Detailed+Check+Information
 	 *
 	 * @param Integer|String $checkId The ID to check
 	 * @return Integer|Mixed
 	 */
 	public function getCheckById($checkId) {
-		$endpoint = '/checks/' . $checkId;
+		$endpoint = '/checks/' . intval($checkId);
 
 		$url = $this->buildUrl($endpoint);
 
@@ -197,8 +213,53 @@ class phpingdom {
 	}
 
 	/**
-	 * Gets the average uptime value on a check for a period of time.
+	 * Create a pingdom check
+	 * @see https://www.pingdom.com/features/api/documentation/#MethodCreate+New+Check
 	 *
+	 * @param $args	Check data
+	 * @return int|Mixed
+	 */
+	public function createCheck($args) {
+		$errors = [];
+		$mandatoryParameters = ['name', 'host', 'type'];
+		$mandatoryTypeParameters = [
+									'httpcustom'	=>	'url',
+									'tcp'			=>	'port',
+									'dns'			=>	['expectedip, nameserver'],
+									'udp'			=>	['port', 'stringtosend', 'stringtoexpect']
+									];
+
+		if (!$args) {
+			$errors[] = 'No arguements passed to createCheck()';
+		}
+
+		// We need to make sure all required parameters are included for the check.
+		$mandatoryParameters = $this->validateParameters($args, $mandatoryParameters);
+		if ($mandatoryParameters) {
+			$errors[] = "Missing the following required parameters: ".implode(',', $mandatoryParameters);
+		}
+
+		$mandatoryTypeParameters = $this->validateParameters($args['type'], $mandatoryTypeParameters[$args['type']]);
+		if ($mandatoryTypeParameters) {
+			$errors[] = "Missing the following type paramters for ".$args['type'].":". implode(',', $mandatoryTypeParameters);
+		}
+
+		if (!$errors) {
+			$endpoint = '/checks';
+
+			$url = $this->buildUrl($endpoint);
+
+			// Time to cURL
+			$data = $this->curlPingdom('POST', $url, $args);
+		} else {
+			$data = $errors;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Gets the average uptime value on a check for a period of time.
 	 * @see https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
 	 *
 	 * @param Integer|String $checkId The ID to check
@@ -206,7 +267,7 @@ class phpingdom {
 	 * @return Integer|Mixed
 	 */
 	public function getCheckSummaryAverage($checkId, $args = null) {
-		$endpoint = '/summary.average/' . $checkId;
+		$endpoint = '/summary.average/' . intval($checkId);
 
 		$url = $this->buildUrl($endpoint, $args);
 
@@ -218,7 +279,6 @@ class phpingdom {
 
 	/**
 	 * Grabs an hourly average response time for a period of time.
-	 *
 	 * @see https://www.pingdom.com/features/api/documentation/#ResourceSummary.hoursofday
 	 *
 	 * @param Integer|String $checkId The ID to check
@@ -226,7 +286,7 @@ class phpingdom {
 	 * @return Integer|Mixed
 	 */
 	public function getCheckSummaryHourly($checkId, $args = null) {
-		$endpoint = '/summary.hoursofday/' . $checkId;
+		$endpoint = '/summary.hoursofday/' . intval($checkId);
 
 		$url = $this->buildUrl($endpoint, $args);
 
@@ -238,7 +298,6 @@ class phpingdom {
 
 	/**
 	 * Grab a checks outage summary from a point in time.
-	 *
 	 * @see https://www.pingdom.com/features/api/documentation/#ResourceSummary.outage
 	 *
 	 * @param Integer|String $checkId The ID to check
@@ -246,7 +305,7 @@ class phpingdom {
 	 * @return Integer|Mixed
 	 */
 	public function getCheckOutageSummary($checkId, $args = null) {
-		$endpoint = '/summary.outage/' . $checkId;
+		$endpoint = '/summary.outage/' . intval($checkId);
 
 		$url = $this->buildUrl($endpoint, $args);
 
@@ -263,6 +322,7 @@ class phpingdom {
 	 * @return Array
 	 */
 	private function curlArguments($arguments){
+		$args = [];
 		foreach ($arguments as $key => $value){
 			$args[] = $key . '=' . $value;
 		}
@@ -284,5 +344,15 @@ class phpingdom {
 			$url = str_replace('&amp;', '&', urldecode(trim($url)));
 		}
 		return $url;
+	}
+
+	private function validateParameters($args, $requiredParameters) {
+		foreach($args as $key => $value) {
+			if (in_array($key, $requiredParameters)) {
+				unset($requiredParameters[$key]);
+			}
+		}
+
+		return $requiredParameters;
 	}
 }
